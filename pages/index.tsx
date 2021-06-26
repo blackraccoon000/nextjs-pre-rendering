@@ -10,6 +10,7 @@ type Props = {
   props: {
     products: Product[];
   };
+  revalidate: number;
 };
 
 const HomePage = ({ products }: { products: Product[] }): JSX.Element => {
@@ -23,6 +24,7 @@ const HomePage = ({ products }: { products: Product[] }): JSX.Element => {
 };
 
 export const getStaticProps = async (): Promise<Props> => {
+  console.log("(Re-)Generating...");
   const filePath: string = path.join(
     process.cwd(),
     "data",
@@ -35,6 +37,7 @@ export const getStaticProps = async (): Promise<Props> => {
     props: {
       products: data.products,
     },
+    revalidate: 10, // seconds
   };
 };
 
