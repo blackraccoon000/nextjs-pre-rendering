@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-// import { GetStaticProps } from "next";
+import { GetStaticProps } from "next";
 
 type Sales = {
   id: string;
@@ -8,8 +8,16 @@ type Sales = {
   volume: number;
 };
 
-const LastSalesPage = (): JSX.Element => {
-  const [sales, setSales] = useState<Array<Sales>>([]);
+type Props = {
+  transformedSales: Sales[];
+};
+
+const LastSalesPage = ({
+  transformedSales,
+}: {
+  transformedSales: Sales[];
+}): JSX.Element => {
+  const [sales, setSales] = useState<Array<Sales>>(transformedSales);
   const url = "https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json";
   const { data, error } = useSWR(url);
 
@@ -28,7 +36,7 @@ const LastSalesPage = (): JSX.Element => {
   }, [data]);
 
   if (error) return <p>Failed to load.</p>;
-  if (!data || sales.length === 0) return <p>Loading...</p>;
+  if (!data && sales.length === 0) return <p>Loading...</p>;
 
   return (
     <ul>
@@ -41,21 +49,24 @@ const LastSalesPage = (): JSX.Element => {
   );
 };
 
-// const getData = async () => {
-//   const url = "https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json";
-//   const data = fetch(url).then((res) => res.json);
-//   const transformedSales: Sales[] = [];
-//   if (data) {
-//     Object.keys(data).map((key) => {
-//       transformedSales.push({
-//         id: key,
-//         username: data[key].username,
-//         volume: data[key].volume,
-//       });
-//     });
-//   }
-// };
-//
-// export const getStaticProps: GetStaticProps = async () => {};
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const transformedSales: Sales[] = [];
+  await fetch("https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json")
+    .then((res) => res.json())
+    .then((data) => {
+      Object.keys(data).map((key) => {
+        transformedSales.push({
+          id: key,
+          ...data[key],
+        });
+      });
+    });
+  return {
+    props: {
+      transformedSales,
+    },
+    // revalidate: 10,
+  };
+};
 
 export default LastSalesPage;
