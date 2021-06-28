@@ -51,16 +51,18 @@ const LastSalesPage = ({
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const transformedSales: Sales[] = [];
-  await fetch("https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json")
-    .then((res) => res.json())
-    .then((data) => {
-      Object.keys(data).map((key) => {
-        transformedSales.push({
-          id: key,
-          ...data[key],
-        });
-      });
+  const response = await fetch(
+    "https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json"
+  );
+  const data = response.json();
+
+  Object.keys(data).map((key) => {
+    transformedSales.push({
+      id: key,
+      ...data[key],
     });
+  });
+
   return {
     props: {
       transformedSales,
