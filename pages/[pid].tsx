@@ -18,12 +18,25 @@ const ProductDetailPage = ({
 }: {
   loadedProduct: Product;
 }): JSX.Element => {
+  // Loading Flag
+  if (!loadedProduct) return <p>Loading...</p>;
   return (
     <Fragment>
       <h1>{loadedProduct.title}</h1>
       <p>{loadedProduct.description}</p>
     </Fragment>
   );
+};
+
+const getData = async () => {
+  const filePath: string = path.join(
+    process.cwd(),
+    "data",
+    "dummy-backend.json"
+  );
+  const jsonData: string = await fs.readFile(filePath, "utf8");
+  const data: Products = JSON.parse(jsonData);
+  return data;
 };
 
 /**
@@ -34,17 +47,13 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
 }) => {
   const productId = params?.pid;
-  console.log("pd:", productId);
-  const filePath: string = path.join(
-    process.cwd(),
-    "data",
-    "dummy-backend.json"
-  );
-  const jsonData: string = await fs.readFile(filePath, "utf8");
-  const data: Products = JSON.parse(jsonData);
+  const data = await getData();
   const product: Product | undefined = data.products.find(
     (product) => product.id === productId
   );
+
+  // Not Found Flag
+  if (!product) return { notFound: true };
 
   return {
     props: {
@@ -52,17 +61,16 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     },
   };
 };
-
+// data.products.id
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
+  const data = await getData();
+  const ids = data.products.map((product) => product.id);
+
+  // Auto Pid Generated
+  const paths = ids.map((id) => ({ params: { pid: id } }));
   return {
-    paths: [
-      { params: { pid: "p1" } },
-      { params: { pid: "p2" } },
-      { params: { pid: "p3" } },
-      { params: { pid: "p4" } },
-      { params: { pid: "p5" } },
-    ],
-    fallback: false,
+    paths,
+    fallback: true,
   };
 };
 
