@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import useSWR from "swr";
+// import { GetStaticProps } from "next";
 
 type Sales = {
   id: string;
@@ -8,28 +10,25 @@ type Sales = {
 
 const LastSalesPage = (): JSX.Element => {
   const [sales, setSales] = useState<Array<Sales>>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const url = "https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json";
+  const { data, error } = useSWR(url);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch("https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const transformedSales: Sales[] = [];
-        Object.keys(data).map((key) => {
-          const sale = {
-            id: key,
-            ...data[key],
-          };
-          transformedSales.push(sale);
-        });
+    const transformedSales: Sales[] = [];
+    if (data) {
+      Object.keys(data).map((key) => {
+        const sale = {
+          id: key,
+          ...data[key],
+        };
+        transformedSales.push(sale);
         setSales(transformedSales);
-        setIsLoading(false);
       });
-  }, []);
+    }
+  }, [data]);
 
-  if (isLoading) return <p>Loading...</p>;
-  if (sales.length === 0) return <p>No data yet</p>;
+  if (error) return <p>Failed to load.</p>;
+  if (!data || sales.length === 0) return <p>Loading...</p>;
 
   return (
     <ul>
@@ -41,5 +40,22 @@ const LastSalesPage = (): JSX.Element => {
     </ul>
   );
 };
+
+// const getData = async () => {
+//   const url = "https://nextjs-afc54-default-rtdb.firebaseio.com/sales.json";
+//   const data = fetch(url).then((res) => res.json);
+//   const transformedSales: Sales[] = [];
+//   if (data) {
+//     Object.keys(data).map((key) => {
+//       transformedSales.push({
+//         id: key,
+//         username: data[key].username,
+//         volume: data[key].volume,
+//       });
+//     });
+//   }
+// };
+//
+// export const getStaticProps: GetStaticProps = async () => {};
 
 export default LastSalesPage;
