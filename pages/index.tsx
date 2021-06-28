@@ -1,9 +1,10 @@
 import React from "react";
 import fs from "fs/promises";
 import path from "path";
+import Link from "next/link";
 
-type Product = { id: string; title: string };
-type Products = {
+export type Product = { id: string; title: string; description: string };
+export type Products = {
   products: Product[];
 };
 type Props = {
@@ -13,17 +14,25 @@ type Props = {
   revalidate: number;
 };
 
+type NotFound = {
+  notFound: boolean;
+};
+
+type NoData = { redirect: { destination: "/no-data" } };
+
 const HomePage = ({ products }: { products: Product[] }): JSX.Element => {
   return (
     <ul>
       {products.map((product: Product) => (
-        <li key={product.id}>{product.title}</li>
+        <li key={product.id}>
+          <Link href={`/${product.id}`}>{product.title}</Link>
+        </li>
       ))}
     </ul>
   );
 };
 
-export const getStaticProps = async (): Promise<Props> => {
+export const getStaticProps = async (): Promise<Props | NotFound | NoData> => {
   console.log("(Re-)Generating...");
   const filePath: string = path.join(
     process.cwd(),
@@ -32,6 +41,10 @@ export const getStaticProps = async (): Promise<Props> => {
   );
   const jsonData: string = await fs.readFile(filePath, "utf8");
   const data: Products = JSON.parse(jsonData);
+
+  if (!data) return { redirect: { destination: "/no-data" } };
+
+  if (data.products.length === 0) return { notFound: true };
 
   return {
     props: {
