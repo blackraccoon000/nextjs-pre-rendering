@@ -25,7 +25,7 @@ const HomePage = ({ products }: { products: Product[] }): JSX.Element => {
     <ul>
       {products.map((product: Product) => (
         <li key={product.id}>
-          <Link href={`/${product.id}`}>{product.title}</Link>
+          <Link href={`/products/${product.id}`}>{product.title}</Link>
         </li>
       ))}
     </ul>

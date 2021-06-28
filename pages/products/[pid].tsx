@@ -3,7 +3,7 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { ParsedUrlQuery } from "querystring";
 import path from "path";
 import fs from "fs/promises";
-import { Product, Products } from "./index";
+import { Product, Products } from "../index";
 
 type Props = {
   loadedProduct: Product | undefined;
