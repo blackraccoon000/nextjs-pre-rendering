@@ -2,7 +2,7 @@
   "name": "nextjs-pre-rendering",
   "version": "0.1.0",
   "private": true,
-	"author": "Yutaka Fujii<yutakaf@playwell.site>",
+  "author": "Yutaka Fujii<yutakaf@playwell.site>",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +11,8 @@
   "dependencies": {
     "next": "10.0.6",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "swr": "^0.5.6"
   },
   "devDependencies": {
     "@types/node": "^15.12.4",
@@ -30,7 +31,7 @@
     "prop-types": "^15.7.2",
     "typescript": "^4.3.4"
   },
-	"engines": {
-		"node": "v14.17.0"
-	}
+  "engines": {
+    "node": "v14.17.0"
+  }
 }
